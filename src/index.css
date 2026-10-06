@@ -1,0 +1,13 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+html { scroll-behavior: smooth; }
+body { @apply bg-paper text-ink font-sans antialiased text-[1.05rem]; }
+h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; }
+::selection { background: #D9A89A; color: #0F2E27; }
+:focus-visible { outline: 2px solid #B8975A; outline-offset: 3px; }
+.ticker { animation: tick 38s linear infinite; }
+@keyframes tick { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .ticker { animation: none; } }
+
+/* header = safe-area + 4rem bar + 2px progress line; anchors stop exactly below it */
+:root { --hh: calc(4rem + 2px + env(safe-area-inset-top, 0px)); }
+.anchor { scroll-margin-top: var(--hh); }
