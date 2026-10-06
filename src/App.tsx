@@ -94,26 +94,55 @@ const work = [
   { src: '/img/pose.jpg', alt: 'Ivory and emerald look with hand jewellery and a poised frontal pose', pos: '50% 12%' },
   { src: '/img/backstage.jpg', alt: 'At work, finishing a bridal hairstyle', pos: '85% 40%' },
 ]
+function useDesktop() {
+  const q = '(min-width: 768px)'
+  const [d, setD] = useState(() => typeof window !== 'undefined' && matchMedia(q).matches)
+  useEffect(() => { const m = matchMedia(q); const f = () => setD(m.matches); f(); m.addEventListener('change', f); return () => m.removeEventListener('change', f) }, [])
+  return d
+}
 function Portfolio() {
+  const desktop = useDesktop()
   const sec = useRef<HTMLElement>(null), track = useRef<HTMLDivElement>(null); const [max, setMax] = useState(0)
-  useEffect(() => { const m = () => setMax(Math.max(0, track.current!.scrollWidth - innerWidth)); m(); addEventListener('resize', m); addEventListener('load', m); return () => { removeEventListener('resize', m); removeEventListener('load', m) } }, [])
+  useEffect(() => {
+    const m = () => setMax(track.current ? Math.max(0, track.current.scrollWidth - innerWidth) : 0)
+    m(); addEventListener('resize', m); addEventListener('load', m); return () => { removeEventListener('resize', m); removeEventListener('load', m) }
+  }, [desktop])
   const { scrollYProgress } = useScroll({ target: sec, offset: ['start start', 'end end'] })
   const x = useTransform(scrollYProgress, [0, 1], [0, -max])
+
+  /* Phones: a normal strip you swipe right to left. */
+  if (!desktop) return (
+    <section id="portfolio" ref={sec} className="anchor bg-paper py-14">
+      <div className="mb-6 flex items-end justify-between gap-4 px-5">
+        <TextEffect as="h2" text="The ivory and emerald edit" className="font-display text-[2.4rem] leading-[1]" />
+        <span className="shrink-0 pb-1 text-sm font-medium">Swipe &rarr;</span>
+      </div>
+      <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
+        {work.map((w) => <div key={w.src} className="aspect-[3/4] w-[78vw] shrink-0 snap-center overflow-hidden"><Photo src={w.src} alt={w.alt} pos={w.pos} className="h-full w-full" /></div>)}
+        <a href={IG} className="flex aspect-[3/4] w-[78vw] shrink-0 snap-center flex-col justify-end bg-emerald p-6 text-champagne">
+          <span className="font-display text-4xl italic leading-tight">New looks go up on Instagram first.</span>
+          <span className="mt-4 w-fit border-b border-gold pb-1 text-base font-medium">@the_happyfaces_</span>
+        </a>
+      </div>
+    </section>
+  )
+
+  /* Desktop: scrolling down pans the strip sideways. */
   return (
     <section id="portfolio" ref={sec} className="relative bg-paper" style={{ height: `calc(100svh + ${max}px)` }}>
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden pt-20">
-        <div className="mb-5 flex items-end justify-between px-5 md:px-10">
-          <TextEffect as="h2" text="The ivory and emerald edit" className="max-w-xl font-display text-[2.4rem] leading-[1] md:text-6xl" />
-          <span className="hidden text-sm font-medium md:block">Keep scrolling</span>
+        <div className="mb-5 flex items-end justify-between px-10">
+          <TextEffect as="h2" text="The ivory and emerald edit" className="max-w-xl font-display text-6xl leading-[1]" />
+          <span className="text-sm font-medium">Keep scrolling</span>
         </div>
-        <motion.div ref={track} style={{ x }} className="flex w-max gap-3 px-5 md:gap-5 md:px-10">
-          {work.map((w) => <div key={w.src + w.pos} className="h-[58svh] shrink-0 overflow-hidden md:h-[64svh]" style={{ aspectRatio: '3 / 4' }}><Photo src={w.src} alt={w.alt} pos={w.pos} className="h-full w-full" /></div>)}
-          <a href={IG} className="flex h-[58svh] w-[70vw] shrink-0 flex-col justify-end bg-emerald p-6 text-champagne md:h-[64svh] md:w-[26rem]">
-            <span className="font-display text-4xl italic leading-tight md:text-5xl">New looks go up on Instagram first.</span>
-            <span className="mt-4 border-b border-gold pb-1 text-base font-medium w-fit">@the_happyfaces_</span>
+        <motion.div ref={track} style={{ x }} className="flex w-max gap-5 px-10">
+          {work.map((w) => <div key={w.src} className="h-[64svh] shrink-0 overflow-hidden" style={{ aspectRatio: '3 / 4' }}><Photo src={w.src} alt={w.alt} pos={w.pos} className="h-full w-full" /></div>)}
+          <a href={IG} className="flex h-[64svh] w-[26rem] shrink-0 flex-col justify-end bg-emerald p-6 text-champagne">
+            <span className="font-display text-5xl italic leading-tight">New looks go up on Instagram first.</span>
+            <span className="mt-4 w-fit border-b border-gold pb-1 text-base font-medium">@the_happyfaces_</span>
           </a>
         </motion.div>
-        <motion.div className="mx-5 mt-6 h-px origin-left bg-emerald md:mx-10" style={{ scaleX: scrollYProgress }} />
+        <motion.div className="mx-10 mt-6 h-px origin-left bg-emerald" style={{ scaleX: scrollYProgress }} />
       </div>
     </section>
   )

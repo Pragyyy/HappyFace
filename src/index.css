@@ -11,3 +11,6 @@ h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; }
 /* header = safe-area + 4rem bar + 2px progress line; anchors stop exactly below it */
 :root { --hh: calc(4rem + 2px + env(safe-area-inset-top, 0px)); }
 .anchor { scroll-margin-top: var(--hh); }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
